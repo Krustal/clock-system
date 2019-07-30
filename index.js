@@ -2,6 +2,7 @@ import * as THREE from "three";
 import OrbitControls from "three-orbitcontrols";
 import earthTexture from "./images/earth_texture_2.jpg";
 import cloudTexture from "./images/clouds_2.jpg";
+import starTexture from "./images/galaxy_starfield.png";
 
 const scene = new THREE.Scene();
 
@@ -47,6 +48,16 @@ const cloudMaterial = new THREE.MeshPhongMaterial({
 
 const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
 scene.add(clouds);
+
+// Starfield
+const starGeometry = new THREE.SphereGeometry(1000, 50, 50);
+const starMaterial = new THREE.MeshPhongMaterial({
+  map: new THREE.TextureLoader().load(starTexture),
+  side: THREE.DoubleSide,
+  shininess: 0
+});
+const starField = new THREE.Mesh(starGeometry, starMaterial);
+scene.add(starField);
 
 const render = actions => {
   // Rotate the earth about the y-axis
