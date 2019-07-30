@@ -1,9 +1,7 @@
 import * as THREE from "three";
 import OrbitControls from "three-orbitcontrols";
-import earthTexture from "./images/earth_texture_2.jpg";
-import cloudTexture from "./images/clouds_2.jpg";
 import starTexture from "./images/galaxy_starfield.png";
-import moonTexture from "./images/moon_texture.jpg";
+import OrbitalBody from "./src/OrbitalBody";
 
 const scene = new THREE.Scene();
 
@@ -19,7 +17,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
-const orbit = new OrbitControls(camera, renderer.domElement);
+new OrbitControls(camera, renderer.domElement);
 
 const ambientLight = new THREE.AmbientLight(0x888888);
 scene.add(ambientLight);
@@ -28,29 +26,7 @@ const directionalLight = new THREE.DirectionalLight(0xfdfcf0, 1);
 directionalLight.position.set(20, 10, 20);
 scene.add(directionalLight);
 
-const earthGeometry = new THREE.SphereGeometry(10, 50, 50);
-const earthMaterial = new THREE.MeshPhongMaterial({
-  map: new THREE.TextureLoader().load(earthTexture),
-  color: 0xaaaaaa,
-  specular: 0x333333,
-  shininess: 25
-});
-const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-
-scene.add(earth);
-
-// Cloud Geometry and Material
-const cloudGeometry = new THREE.SphereGeometry(10.3, 50, 50);
-const cloudMaterial = new THREE.MeshPhongMaterial({
-  map: new THREE.TextureLoader().load(cloudTexture),
-  transparent: true,
-  opacity: 0.2
-});
-
-const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
-scene.add(clouds);
-
-// Starfield
+// StarField
 const starGeometry = new THREE.SphereGeometry(1000, 50, 50);
 const starMaterial = new THREE.MeshPhongMaterial({
   map: new THREE.TextureLoader().load(starTexture),
@@ -60,26 +36,40 @@ const starMaterial = new THREE.MeshPhongMaterial({
 const starField = new THREE.Mesh(starGeometry, starMaterial);
 scene.add(starField);
 
+// System Code
+
+const system = {
+  au: 35
+};
+
+// Planet
+const planet = new OrbitalBody({ size: 10, plot: 0, semiMajorAxis: 0 }, system);
+scene.add(planet.mesh);
+
 // Moon
 let moonRadius = 35;
 let moonTheta = 0;
 let moonDeltaTheta = (2 * Math.PI) / 1000;
-const moonGeometry = new THREE.SphereGeometry(3.5, 50, 50);
-const moonMaterial = new THREE.MeshPhongMaterial({
-  map: new THREE.TextureLoader().load(moonTexture)
-});
-const moon = new THREE.Mesh(moonGeometry, moonMaterial);
-moon.position.set(35, 0, 0);
-scene.add(moon);
+const moon1 = new OrbitalBody({ size: 3.5, plot: 0, semiMajorAxis: 1 }, system);
+// moon1.getMesh().position.set(35, 0, 0);
+scene.add(moon1.mesh);
+
+const moon2 = new OrbitalBody(
+  { size: 3.5, plot: 180, semiMajorAxis: 1 },
+  system
+);
+// moon2.getMesh().position.set(-35, 0, 0);
+scene.add(moon2.mesh);
+
+// Renderer
 
 const render = actions => {
   // Rotate the earth about the y-axis
-  earth.rotation.y += 0.0005;
-  clouds.rotation.y -= 0.00025;
+  // planet.getMesh().rotation.y += 0.0005;
   // Increment moon's theta, and update x & y positon based off new theta value
-  moonTheta += moonDeltaTheta;
-  moon.position.x = moonRadius * Math.cos(moonTheta);
-  moon.position.z = moonRadius * Math.sin(moonTheta);
+  // moonTheta += moonDeltaTheta;
+  // moon.getMesh().position.x = moonRadius * Math.cos(moonTheta);
+  // moon.getMesh().position.z = moonRadius * Math.sin(moonTheta);
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 };
