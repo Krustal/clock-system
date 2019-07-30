@@ -3,6 +3,7 @@ import OrbitControls from "three-orbitcontrols";
 import earthTexture from "./images/earth_texture_2.jpg";
 import cloudTexture from "./images/clouds_2.jpg";
 import starTexture from "./images/galaxy_starfield.png";
+import moonTexture from "./images/moon_texture.jpg";
 
 const scene = new THREE.Scene();
 
@@ -59,10 +60,26 @@ const starMaterial = new THREE.MeshPhongMaterial({
 const starField = new THREE.Mesh(starGeometry, starMaterial);
 scene.add(starField);
 
+// Moon
+let moonRadius = 35;
+let moonTheta = 0;
+let moonDeltaTheta = (2 * Math.PI) / 1000;
+const moonGeometry = new THREE.SphereGeometry(3.5, 50, 50);
+const moonMaterial = new THREE.MeshPhongMaterial({
+  map: new THREE.TextureLoader().load(moonTexture)
+});
+const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+moon.position.set(35, 0, 0);
+scene.add(moon);
+
 const render = actions => {
   // Rotate the earth about the y-axis
   earth.rotation.y += 0.0005;
   clouds.rotation.y -= 0.00025;
+  // Increment moon's theta, and update x & y positon based off new theta value
+  moonTheta += moonDeltaTheta;
+  moon.position.x = moonRadius * Math.cos(moonTheta);
+  moon.position.z = moonRadius * Math.sin(moonTheta);
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 };
