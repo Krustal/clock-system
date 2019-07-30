@@ -11,7 +11,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   2000
 );
-camera.position.set(0, 35, 70);
+camera.position.set(0, 280, 560);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -46,30 +46,28 @@ const system = {
 const planet = new OrbitalBody({ size: 10, plot: 0, semiMajorAxis: 0 }, system);
 scene.add(planet.mesh);
 
-// Moon
-let moonRadius = 35;
-let moonTheta = 0;
-let moonDeltaTheta = (2 * Math.PI) / 1000;
-const moon1 = new OrbitalBody({ size: 3.5, plot: 0, semiMajorAxis: 1 }, system);
-// moon1.getMesh().position.set(35, 0, 0);
-scene.add(moon1.mesh);
+// Moons
+const moons = [
+  { name: "evens", size: 3.5, plot: 0, semiMajorAxis: 1 },
+  { name: "odds", size: 3.5, plot: 180, semiMajorAxis: 1 },
+  { name: "dawn", size: 3.5, plot: 0, semiMajorAxis: 2 },
+  { name: "dusk", size: 3.5, plot: 180, semiMajorAxis: 2 },
+  { name: "week", size: 3.5, plot: 0, semiMajorAxis: 3 },
+  { name: "evenMonths", size: 3.5, plot: 0, semiMajorAxis: 4 },
+  { name: "oddMonths", size: 3.5, plot: 180, semiMajorAxis: 4 },
+  { name: "yearRise", size: 3.5, plot: 0, semiMajorAxis: 5 },
+  { name: "yearFall", size: 3.5, plot: 180, semiMajorAxis: 5 },
+  { name: "generation", size: 3.5, plot: 0, semiMajorAxis: 6 }
+];
 
-const moon2 = new OrbitalBody(
-  { size: 3.5, plot: 180, semiMajorAxis: 1 },
-  system
-);
-// moon2.getMesh().position.set(-35, 0, 0);
-scene.add(moon2.mesh);
+moons.forEach(moon => {
+  const moonBody = new OrbitalBody(moon, system);
+  scene.add(moonBody.mesh);
+});
 
 // Renderer
 
 const render = actions => {
-  // Rotate the earth about the y-axis
-  // planet.getMesh().rotation.y += 0.0005;
-  // Increment moon's theta, and update x & y positon based off new theta value
-  // moonTheta += moonDeltaTheta;
-  // moon.getMesh().position.x = moonRadius * Math.cos(moonTheta);
-  // moon.getMesh().position.z = moonRadius * Math.sin(moonTheta);
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 };
