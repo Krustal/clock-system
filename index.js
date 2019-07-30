@@ -38,6 +38,8 @@ const earth = new THREE.Mesh(earthGeometry, earthMaterial);
 scene.add(earth);
 
 const render = actions => {
+  // Rotate the earth about the y-axis
+  earth.rotation.y -= 0.0005;
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 };
