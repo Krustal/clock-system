@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import OrbitControls from "three-orbitcontrols";
 import earthTexture from "./images/earth_texture_2.jpg";
 
 const scene = new THREE.Scene();
@@ -15,6 +16,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
+const orbit = new OrbitControls(camera, renderer.domElement);
 
 const ambientLight = new THREE.AmbientLight(0x888888);
 scene.add(ambientLight);
