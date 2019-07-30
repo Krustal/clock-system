@@ -1,16 +1,17 @@
 import * as THREE from "three";
 import OrbitControls from "three-orbitcontrols";
 import earthTexture from "./images/earth_texture_2.jpg";
+import cloudTexture from "./images/clouds_2.jpg";
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-  75,
+  45,
   window.innerWidth / window.innerHeight,
   1,
-  1000
+  2000
 );
-camera.position.set(0, 0, 10);
+camera.position.set(0, 35, 70);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -25,9 +26,8 @@ const directionalLight = new THREE.DirectionalLight(0xfdfcf0, 1);
 directionalLight.position.set(20, 10, 20);
 scene.add(directionalLight);
 
-const earthGeometry = new THREE.SphereGeometry(5, 50, 50);
+const earthGeometry = new THREE.SphereGeometry(10, 50, 50);
 const earthMaterial = new THREE.MeshPhongMaterial({
-  // map: new THREE.ImageUtils.loadTexture("./images/earth_texture_2.jpg"),
   map: new THREE.TextureLoader().load(earthTexture),
   color: 0xaaaaaa,
   specular: 0x333333,
@@ -37,9 +37,21 @@ const earth = new THREE.Mesh(earthGeometry, earthMaterial);
 
 scene.add(earth);
 
+// Cloud Geometry and Material
+const cloudGeometry = new THREE.SphereGeometry(10.3, 50, 50);
+const cloudMaterial = new THREE.MeshPhongMaterial({
+  map: new THREE.TextureLoader().load(cloudTexture),
+  transparent: true,
+  opacity: 0.2
+});
+
+const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
+scene.add(clouds);
+
 const render = actions => {
   // Rotate the earth about the y-axis
-  earth.rotation.y -= 0.0005;
+  earth.rotation.y += 0.0005;
+  clouds.rotation.y -= 0.00025;
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 };
