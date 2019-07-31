@@ -63,6 +63,7 @@ const moons = [
 moons.forEach(moon => {
   const moonBody = new OrbitalBody(moon, system);
   scene.add(moonBody.mesh);
+  scene.add(moonBody.orbit);
 });
 
 // Renderer

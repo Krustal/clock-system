@@ -1,4 +1,10 @@
-import { SphereGeometry, MeshPhongMaterial, Mesh } from "three";
+import {
+  SphereGeometry,
+  TorusGeometry,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  Mesh
+} from "three";
 
 // TODO: we are assuming circular orbit ATM
 export default class OrbitalBody {
@@ -11,7 +17,10 @@ export default class OrbitalBody {
     this.material = new MeshPhongMaterial({
       color: 0xaaaaaa
     });
+    this.orbitGeometry = new TorusGeometry(this.radius, 0.4, 8, 100);
+    this.orbitMaterial = new MeshBasicMaterial({ color: 0x888888 });
     this._mesh = new Mesh(this.geometry, this.material);
+    this._orbitMesh = new Mesh(this.orbitGeometry, this.orbitMaterial);
   }
 
   get x() {
@@ -29,5 +38,10 @@ export default class OrbitalBody {
   get mesh() {
     this._mesh.position.set(this.x, 0, this.z);
     return this._mesh;
+  }
+
+  get orbit() {
+    this._orbitMesh.rotation.x = Math.PI / 2;
+    return this._orbitMesh;
   }
 }
