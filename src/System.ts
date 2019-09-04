@@ -15,8 +15,16 @@ import starTexture from "../images/galaxy_starfield.png";
 import OrbitalBody from "./OrbitalBody";
 
 export default class System {
-  constructor(config) {
-    this.config = config;
+  scene: Scene;
+  camera: PerspectiveCamera;
+  renderer: WebGLRenderer;
+  ticks: number;
+  epoch: number;
+  bodies: OrbitalBody[];
+  constructor(public config: { au: number }) {
+    this.bodies = [];
+    this.epoch = new Date().valueOf();
+    this.ticks = 0; // minutes since epoch
     const scene = new Scene();
 
     const camera = new PerspectiveCamera(
@@ -55,18 +63,24 @@ export default class System {
     this.renderer = renderer;
   }
 
-  addBody(bodyConfig) {
-    const moonBody = new OrbitalBody(bodyConfig, this.config);
+  addBody(moonBody) {
+    this.bodies.push(moonBody);
     this.scene.add(moonBody.mesh);
     this.scene.add(moonBody.orbit);
   }
 
   start() {
     const render = () => {
+      this.ticks = (new Date().valueOf() - this.epoch) / 1000;
+      this.bodies.forEach(body => body.update());
       this.renderer.render(this.scene, this.camera);
       requestAnimationFrame(render);
       return Promise.resolve("Dummy response to avoid noisy console");
     };
     render();
+  }
+
+  get au() {
+    return this.config.au;
   }
 }
