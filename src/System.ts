@@ -71,7 +71,6 @@ export default class System {
 
   start() {
     const render = () => {
-      this.ticks = (new Date().valueOf() - this.epoch) / 1000;
       this.bodies.forEach(body => body.update());
       this.renderer.render(this.scene, this.camera);
       requestAnimationFrame(render);
