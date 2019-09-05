@@ -128,22 +128,27 @@ const moons = [
     longitudeOfAscNode: 0,
     argOfPeriapsis: 0,
     period: 100000
+  },
+  {
+    name: "sun",
+    size: 6,
+    trueAnamoly: 0,
+    eccentricity: 0,
+    semiMajorAxis: 8,
+    inclination: 30,
+    longitudeOfAscNode: 0,
+    argOfPeriapsis: 0,
+    period: 10,
+    lumoscity: 1
   }
 ];
 
 moons.forEach(moonProps => {
-  const moon = new OrbitalBody(
-    moonProps.name,
-    moonProps.size,
-    moonProps.trueAnamoly,
-    moonProps.eccentricity,
-    moonProps.semiMajorAxis,
-    moonProps.inclination,
-    moonProps.longitudeOfAscNode,
-    moonProps.argOfPeriapsis,
-    moonProps.period * timeScale,
+  const moon = new OrbitalBody({
+    ...moonProps,
+    period: moonProps.period * timeScale,
     system
-  );
+  });
   system.addBody(moon);
 });
 
