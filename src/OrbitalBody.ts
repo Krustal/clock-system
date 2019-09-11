@@ -4,7 +4,9 @@ import {
   MeshBasicMaterial,
   MeshPhongMaterial,
   Mesh,
-  Color
+  Color,
+  Object3D,
+  Vector3
 } from "three";
 import System from "./System";
 
@@ -30,6 +32,29 @@ interface BodyProperties {
   period?: number;
   lumoscity?: number;
   system: System;
+}
+
+function rotateAboutPoint(
+  obj: Object3D,
+  point: Vector3,
+  axis: Vector3,
+  theta: number,
+  pointIsWorld: boolean
+) {
+  pointIsWorld = pointIsWorld === undefined ? false : pointIsWorld;
+  if (pointIsWorld) {
+    // compensate for world coordinate
+    obj.parent.localToWorld(obj.position);
+  }
+
+  obj.position.sub(point);
+  obj.position.applyAxisAngle(axis, theta);
+  obj.position.add(point); //re-add the offset
+
+  if (pointIsWorld) {
+    obj.parent.worldToLocal(obj.position); // undo world coordinates compesation
+  }
+  obj.rotateOnAxis(axis, theta); // rotate the OBJECT
 }
 
 // TODO: we are assuming circular orbit ATM (so the semi-major axis is identical
@@ -132,5 +157,12 @@ export default class OrbitalBody {
 
   update() {
     this._mesh.position.set(this.x, 0, this.z);
+    rotateAboutPoint(
+      this._mesh,
+      new Vector3(0, 0, 0),
+      new Vector3(1, 0, 0),
+      (this.inclination * Math.PI) / 180,
+      false
+    );
   }
 }
