@@ -3,7 +3,7 @@ import System from "./src/System";
 import OrbitalBody from "./src/OrbitalBody";
 
 // System Code
-const system = new System({ au: 35 });
+const system = new System({ au: 35 }, true);
 
 const timeScale = 0.6; // period of 1 takes ## seconds
 // Moons
