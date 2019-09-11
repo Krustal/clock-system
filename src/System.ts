@@ -8,7 +8,8 @@ import {
   MeshPhongMaterial,
   TextureLoader,
   Mesh,
-  DoubleSide
+  DoubleSide,
+  AxesHelper
 } from "three";
 import OrbitControls from "three-orbitcontrols";
 import starTexture from "../images/galaxy_starfield.png";
@@ -21,7 +22,7 @@ export default class System {
   ticks: number;
   epoch: number;
   bodies: OrbitalBody[];
-  constructor(public config: { au: number }) {
+  constructor(public config: { au: number }, public debug: boolean = false) {
     this.bodies = [];
     this.epoch = new Date().valueOf();
     this.ticks = 0; // minutes since epoch
@@ -57,6 +58,12 @@ export default class System {
     });
     const starField = new Mesh(starGeometry, starMaterial);
     scene.add(starField);
+
+    // DEBUG
+    if (debug) {
+      var axesHelper = new AxesHelper(50);
+      scene.add(axesHelper);
+    }
 
     this.scene = scene;
     this.camera = camera;

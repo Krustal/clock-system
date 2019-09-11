@@ -4,7 +4,9 @@ import {
   MeshBasicMaterial,
   MeshPhongMaterial,
   Mesh,
-  Color
+  Color,
+  Object3D,
+  Vector3
 } from "three";
 import System from "./System";
 
@@ -18,6 +20,43 @@ function stringToDecimal(input: string): number {
   return val * (1 / 10 ** val.toString().length);
 }
 
+interface BodyProperties {
+  name: string;
+  size: number;
+  trueAnamoly?: number;
+  eccentricity?: number; // TODO: unsupported
+  semiMajorAxis: number;
+  inclination?: number;
+  longitudeOfAscNode?: number;
+  argOfPeriapsis?: number;
+  period?: number;
+  lumoscity?: number;
+  system: System;
+}
+
+function rotateAboutPoint(
+  obj: Object3D,
+  point: Vector3,
+  axis: Vector3,
+  theta: number,
+  pointIsWorld: boolean
+) {
+  pointIsWorld = pointIsWorld === undefined ? false : pointIsWorld;
+  if (pointIsWorld) {
+    // compensate for world coordinate
+    obj.parent.localToWorld(obj.position);
+  }
+
+  obj.position.sub(point);
+  obj.position.applyAxisAngle(axis, theta);
+  obj.position.add(point); //re-add the offset
+
+  if (pointIsWorld) {
+    obj.parent.worldToLocal(obj.position); // undo world coordinates compesation
+  }
+  obj.rotateOnAxis(axis, theta); // rotate the OBJECT
+}
+
 // TODO: we are assuming circular orbit ATM (so the semi-major axis is identical
 // to peri and apo apsies)
 export default class OrbitalBody {
@@ -28,6 +67,16 @@ export default class OrbitalBody {
   private orbitGeometry: TorusGeometry;
   private _mesh: Mesh;
   private _orbitMesh: Mesh;
+  public name: string;
+  public size: number;
+  public trueAnamoly: number;
+  public eccentricity: number; // TODO: unsupported;
+  public semiMajorAxis: number;
+  public inclination: number;
+  public longitudeOfAscNode: number;
+  public argOfPeriapsis: number;
+  public period: number;
+  public system: System;
   /**
    *
    * @param size - radius of the orbital body
@@ -42,18 +91,29 @@ export default class OrbitalBody {
    * @param period - The time (in seconds) the body takes to orbit
    * @param system
    */
-  constructor(
-    public name: string,
-    public size: number,
-    public trueAnamoly: number,
-    public eccentricity: number, // TODO: unsupported
-    public semiMajorAxis: number,
-    public inclination: number,
-    public longitudeOfAscNode: number,
-    public argOfPeriapsis: number,
-    public period: number,
-    public system: System
-  ) {
+  constructor({
+    name,
+    size,
+    trueAnamoly = 0,
+    eccentricity = 0,
+    semiMajorAxis,
+    inclination = 0,
+    longitudeOfAscNode = 0,
+    argOfPeriapsis = 0,
+    period,
+    lumoscity = 0,
+    system
+  }: BodyProperties) {
+    this.name = name;
+    this.size = size;
+    this.trueAnamoly = trueAnamoly;
+    this.eccentricity = eccentricity;
+    this.semiMajorAxis = semiMajorAxis;
+    this.inclination = inclination;
+    this.longitudeOfAscNode = longitudeOfAscNode;
+    this.argOfPeriapsis = argOfPeriapsis;
+    this.period = period;
+    this.system = system;
     this.radius = semiMajorAxis * system.au;
     this.geometry = new SphereGeometry(size, 50, 50);
     const color = new Color(0xaaaaaa);
@@ -90,11 +150,19 @@ export default class OrbitalBody {
   }
 
   get orbit() {
-    this._orbitMesh.rotation.x = Math.PI / 2;
+    this._orbitMesh.rotation.x =
+      Math.PI / 2 + (this.inclination / 180) * Math.PI;
     return this._orbitMesh;
   }
 
   update() {
     this._mesh.position.set(this.x, 0, this.z);
+    rotateAboutPoint(
+      this._mesh,
+      new Vector3(0, 0, 0),
+      new Vector3(1, 0, 0),
+      (this.inclination * Math.PI) / 180,
+      false
+    );
   }
 }
