@@ -3,7 +3,7 @@ import System from "./src/System";
 import OrbitalBody from "./src/OrbitalBody";
 
 // System Code
-const system = new System({ au: 35 });
+const system = new System({ au: 35 }, true);
 
 const timeScale = 0.6; // period of 1 takes ## seconds
 // Moons
@@ -135,8 +135,10 @@ const moons = [
     trueAnamoly: 0,
     eccentricity: 0,
     semiMajorAxis: 8,
+    // inclination: 0,
     inclination: 30,
-    longitudeOfAscNode: 0,
+    // longitudeOfAscNode: 90,
+    pressessionPeriodOfAscNode: 100, // orbital period
     argOfPeriapsis: 0,
     period: 10,
     lumoscity: 1
