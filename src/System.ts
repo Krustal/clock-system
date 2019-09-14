@@ -34,13 +34,15 @@ export default class System {
       1,
       2000
     );
-    camera.position.set(0, 280, 560);
+    camera.position.set(0, -560, 280);
+    camera.up.set(0, 0, 1);
 
     const renderer = new WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     document.body.appendChild(renderer.domElement);
-    new OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls;
 
     const ambientLight = new AmbientLight(0x888888);
     scene.add(ambientLight);

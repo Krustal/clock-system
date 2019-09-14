@@ -31,7 +31,7 @@ interface BodyProperties {
   argOfPeriapsis?: number;
   period?: number;
   lumoscity?: number;
-  pressessionPeriodOfAscNode?: number;
+  pressession?: number;
   system: System;
 }
 
@@ -82,7 +82,7 @@ export default class OrbitalBody {
   public argOfPeriapsis: number;
   public period: number;
   public system: System;
-  public pressessionPeriodOfAscNode: number;
+  public pressession: number;
   public lastTick: number;
   /**
    *
@@ -109,7 +109,7 @@ export default class OrbitalBody {
     argOfPeriapsis = 0,
     period,
     lumoscity = 0,
-    pressessionPeriodOfAscNode = 0,
+    pressession: pressessionPeriodOfAscNode = 0,
     system
   }: BodyProperties) {
     this.lastTick = 0;
@@ -124,7 +124,7 @@ export default class OrbitalBody {
     this.period = period;
     this.system = system;
     this.radius = semiMajorAxis * system.au;
-    this.pressessionPeriodOfAscNode = pressessionPeriodOfAscNode;
+    this.pressession = pressessionPeriodOfAscNode;
     this.geometry = new SphereGeometry(size, 50, 50);
     const color = new Color(0xaaaaaa);
     if (RANDOM_COLORS) color.setHex(stringToDecimal(name) * 0xffffff);
@@ -196,9 +196,8 @@ export default class OrbitalBody {
     // this.lastTick = this.system.ticks - this.lastTick >= 1 ? this.system;
     // this._mesh.position.set(this.x, this.y, 0);
     let ascNodeDelta = 0;
-    if (this.pressessionPeriodOfAscNode > 0) {
-      ascNodeDelta =
-        (this.system.ticks - this.lastTick) / this.pressessionPeriodOfAscNode;
+    if (this.pressession > 0) {
+      ascNodeDelta = (this.system.ticks - this.lastTick) / this.pressession;
     }
     let bodyDelta = (this.system.ticks - this.lastTick) / this.period;
     if (this.name === "sun")

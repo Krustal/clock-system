@@ -138,7 +138,7 @@ const moons = [
     // inclination: 0,
     inclination: 30,
     // longitudeOfAscNode: 90,
-    pressessionPeriodOfAscNode: 100, // orbital period
+    pressession: 100, // orbital period
     argOfPeriapsis: 0,
     period: 10,
     lumoscity: 1
