@@ -6,7 +6,8 @@ import {
   Mesh,
   Color,
   Object3D,
-  Vector3
+  Vector3,
+  Euler
 } from "three";
 import System from "./System";
 
@@ -135,6 +136,7 @@ export default class OrbitalBody {
 
     this._mesh = new Mesh(this.geometry, this.material);
     this._orbitMesh = new Mesh(this.orbitGeometry, this.orbitMaterial);
+    this._orbitMesh.rotation.x = this.inclination;
   }
 
   get x() {
@@ -151,7 +153,17 @@ export default class OrbitalBody {
         ? (this.trueAnamoly - (this.system.ticks / this.period) * 360) % 360
         : this.trueAnamoly;
     return (position / 180) * Math.PI;
-    // return (this.trueAnamoly / 180) * Math.PI;
+  }
+
+  get ascNodeTheta() {
+    const rotations =
+      this.pressession > 0 && this.system.ticks !== 0
+        ? (this.system.ticks % this.pressession) / this.pressession
+        : 1;
+    return (
+      (angleToRad(this.longitudeOfAscNode) + 2 * Math.PI * rotations) %
+      (2 * Math.PI)
+    );
   }
 
   get mesh() {
@@ -166,86 +178,16 @@ export default class OrbitalBody {
     return this._mesh;
   }
 
-  get orbit() {
-    if (this.longitudeOfAscNode !== 0) {
-      rotateAboutPoint(
-        this._orbitMesh,
-        new Vector3(0, 0, 0),
-        new Vector3(0, 0, 1),
-        angleToRad(this.longitudeOfAscNode),
-        false
-      );
-      // this._orbitMesh.position.applyAxisAngle(
-      //   new Vector3(0, 1, 0),
-      //   (this.longitudeOfAscNode / 180) * Math.PI
-      // );
-    }
-    rotateAboutPoint(
-      this._orbitMesh,
-      new Vector3(0, 0, 0),
-      new Vector3(1, 0, 0),
-      // (this.inclination * Math.PI) / 180,
-      angleToRad(this.inclination),
-      false
+  get orbit(): Mesh {
+    this._orbitMesh.setRotationFromEuler(
+      new Euler(angleToRad(this.inclination), 0, this.ascNodeTheta, "ZXY")
     );
 
     return this._orbitMesh;
   }
 
   update() {
-    // this.lastTick = this.system.ticks - this.lastTick >= 1 ? this.system;
-    // this._mesh.position.set(this.x, this.y, 0);
-    let ascNodeDelta = 0;
-    if (this.pressession > 0) {
-      ascNodeDelta = (this.system.ticks - this.lastTick) / this.pressession;
-    }
-    let bodyDelta = (this.system.ticks - this.lastTick) / this.period;
-    if (this.name === "sun")
-      rotateAboutPoint(
-        this._mesh,
-        new Vector3(0, 0, 0),
-        new Vector3(1, 0, 0),
-        -angleToRad(this.inclination),
-        false
-      );
-    rotateAboutPoint(
-      this._mesh,
-      new Vector3(0, 0, 0),
-      new Vector3(0, 0, 1),
-      angleToRad(bodyDelta + ascNodeDelta),
-      false
-    );
-    rotateAboutPoint(
-      this._mesh,
-      new Vector3(0, 0, 0),
-      new Vector3(1, 0, 0),
-      angleToRad(this.inclination),
-      false
-    );
-
-    rotateAboutPoint(
-      this._orbitMesh,
-      new Vector3(0, 0, 0),
-      new Vector3(1, 0, 0),
-      // (this.inclination * Math.PI) / 180,
-      -angleToRad(this.inclination),
-      false
-    );
-    rotateAboutPoint(
-      this._orbitMesh,
-      new Vector3(0, 0, 0),
-      new Vector3(0, 0, 1),
-      angleToRad(ascNodeDelta),
-      false
-    );
-    rotateAboutPoint(
-      this._orbitMesh,
-      new Vector3(0, 0, 0),
-      new Vector3(1, 0, 0),
-      // (this.inclination * Math.PI) / 180,
-      angleToRad(this.inclination),
-      false
-    );
-    this.lastTick = this.system.ticks;
+    this.mesh;
+    this.orbit;
   }
 }
