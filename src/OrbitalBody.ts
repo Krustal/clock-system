@@ -5,9 +5,8 @@ import {
   MeshPhongMaterial,
   Mesh,
   Color,
-  Object3D,
-  Vector3,
-  Euler
+  Euler,
+  Group
 } from "three";
 import System from "./System";
 
@@ -40,29 +39,6 @@ function angleToRad(angle: number): number {
   return (angle * Math.PI) / 180;
 }
 
-function rotateAboutPoint(
-  obj: Object3D,
-  point: Vector3,
-  axis: Vector3,
-  theta: number,
-  pointIsWorld: boolean
-) {
-  pointIsWorld = pointIsWorld === undefined ? false : pointIsWorld;
-  if (pointIsWorld) {
-    // compensate for world coordinate
-    obj.parent.localToWorld(obj.position);
-  }
-
-  obj.position.sub(point);
-  obj.position.applyAxisAngle(axis, theta);
-  obj.position.add(point); //re-add the offset
-
-  if (pointIsWorld) {
-    obj.parent.worldToLocal(obj.position); // undo world coordinates compesation
-  }
-  obj.rotateOnAxis(axis, theta); // rotate the OBJECT
-}
-
 // TODO: we are assuming circular orbit ATM (so the semi-major axis is identical
 // to peri and apo apsies)
 export default class OrbitalBody {
@@ -73,6 +49,7 @@ export default class OrbitalBody {
   private orbitGeometry: TorusGeometry;
   private _mesh: Mesh;
   private _orbitMesh: Mesh;
+  private _overall: Group;
   public name: string;
   public size: number;
   public trueAnamoly: number;
@@ -130,13 +107,16 @@ export default class OrbitalBody {
     const color = new Color(0xaaaaaa);
     if (RANDOM_COLORS) color.setHex(stringToDecimal(name) * 0xffffff);
     this.material = new MeshPhongMaterial({ color });
+    this.material.lightMapIntensity = 100;
 
     this.orbitMaterial = new MeshBasicMaterial({ color: 0x888888 });
     this.orbitGeometry = new TorusGeometry(this.radius, 0.4, 8, 100);
 
     this._mesh = new Mesh(this.geometry, this.material);
     this._orbitMesh = new Mesh(this.orbitGeometry, this.orbitMaterial);
-    this._orbitMesh.rotation.x = this.inclination;
+    this._overall = new Group();
+    this._overall.add(this._orbitMesh);
+    this._overall.add(this._mesh);
   }
 
   get x() {
@@ -161,33 +141,19 @@ export default class OrbitalBody {
         ? (this.system.ticks % this.pressession) / this.pressession
         : 1;
     return (
-      (angleToRad(this.longitudeOfAscNode) + 2 * Math.PI * rotations) %
+      (angleToRad(this.longitudeOfAscNode) - 2 * Math.PI * rotations) %
       (2 * Math.PI)
     );
   }
 
-  get mesh() {
-    this._mesh.position.set(this.x, this.y, 0);
-    rotateAboutPoint(
-      this._mesh,
-      new Vector3(0, 0, 0),
-      new Vector3(1, 0, 0),
-      angleToRad(this.inclination),
-      false
-    );
-    return this._mesh;
-  }
-
-  get orbit(): Mesh {
-    this._orbitMesh.setRotationFromEuler(
-      new Euler(angleToRad(this.inclination), 0, this.ascNodeTheta, "ZXY")
-    );
-
-    return this._orbitMesh;
+  get overall(): Group {
+    return this._overall;
   }
 
   update() {
-    this.mesh;
-    this.orbit;
+    this._overall.setRotationFromEuler(
+      new Euler(angleToRad(this.inclination), 0, this.ascNodeTheta, "ZXY")
+    );
+    this._mesh.position.set(this.x, this.y, 0);
   }
 }

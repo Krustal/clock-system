@@ -74,8 +74,7 @@ export default class System {
 
   addBody(moonBody) {
     this.bodies.push(moonBody);
-    this.scene.add(moonBody.mesh);
-    this.scene.add(moonBody.orbit);
+    this.scene.add(moonBody.overall);
   }
 
   start() {
