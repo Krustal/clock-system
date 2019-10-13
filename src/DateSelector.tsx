@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, MaskedInput, Text } from "grommet";
+import { Box, MaskedInput, Text, TextInput } from "grommet";
 
 interface DateSelectorProps {
   ticks: number;
@@ -33,10 +33,8 @@ const getTicksFromDate = (date: SystemDate): number => {
   const weekTicks = (parseInt(date.week) - 1) * 100;
   const monthTicks = (parseInt(date.month) - 1) * 500;
   const yearTicks = (parseInt(date.year) - 1) * 5000;
-  const generationTicks = parseInt(date.generation) * 100000;
-  return (
-    hourTicks + dayTicks + weekTicks + monthTicks + yearTicks + generationTicks
-  );
+  // const generationTicks = parseInt(date.generation) * 100000;
+  return hourTicks + dayTicks + weekTicks + monthTicks + yearTicks;
 };
 const DateSelector = (props: DateSelectorProps) => {
   const [date, setDate] = useState(getDateFromTicks(props.ticks));
@@ -49,28 +47,7 @@ const DateSelector = (props: DateSelectorProps) => {
 
   return (
     <Box direction="row" align="center">
-      <MaskedInput
-        key="generations"
-        mask={[
-          {
-            length: [3],
-            regexp: /^[0-9]$|^[0-9][0-9]$|^[0-9][0-9][0-9]$/,
-            placeholder: "yyy"
-          }
-        ]}
-        value={date.generation}
-        onChange={e => {
-          setDate({ ...date, generation: e.target.value });
-        }}
-        onBlur={() => {
-          const finalGeneration = !date.generation ? "0" : date.generation;
-          setDate({ ...date, generation: finalGeneration });
-          props.onBlur(
-            getTicksFromDate({ ...date, generation: finalGeneration })
-          );
-        }}
-        onClick={props.onClick}
-      />
+      <TextInput key="generations" value={date.generation} disabled />
       <Text>:</Text>
       <MaskedInput
         key="years"
