@@ -1,7 +1,5 @@
 import {
   Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
   AmbientLight,
   DirectionalLight,
   SphereGeometry,
@@ -11,45 +9,21 @@ import {
   DoubleSide,
   AxesHelper
 } from "three";
-import OrbitControls from "three-orbitcontrols";
 import starTexture from "../images/galaxy_starfield.png";
 import OrbitalBody from "./OrbitalBody";
 
 export default class System {
-  scene: Scene;
-  camera: PerspectiveCamera;
-  renderer: WebGLRenderer;
-  ticks: number;
-  epoch: number;
-  bodies: OrbitalBody[];
+  readonly scene: Scene = new Scene();
+  readonly epoch: number = new Date().valueOf();
+  readonly bodies: OrbitalBody[] = [];
+  ticks: number = 0;
   constructor(public config: { au: number }, public debug: boolean = false) {
-    this.bodies = [];
-    this.epoch = new Date().valueOf();
-    this.ticks = 0; // minutes since epoch
-    const scene = new Scene();
-
-    const camera = new PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      1,
-      2000
-    );
-    camera.position.set(0, -560, 280);
-    camera.up.set(0, 0, 1);
-
-    const renderer = new WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    document.body.appendChild(renderer.domElement);
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls;
-
     const ambientLight = new AmbientLight(0x888888);
-    scene.add(ambientLight);
+    this.scene.add(ambientLight);
 
     const directionalLight = new DirectionalLight(0xfdfcf0, 1);
     directionalLight.position.set(20, 10, 20);
-    scene.add(directionalLight);
+    this.scene.add(directionalLight);
 
     // StarField
     const starGeometry = new SphereGeometry(1000, 50, 50);
@@ -59,17 +33,13 @@ export default class System {
       shininess: 0
     });
     const starField = new Mesh(starGeometry, starMaterial);
-    scene.add(starField);
+    this.scene.add(starField);
 
     // DEBUG
     if (debug) {
       var axesHelper = new AxesHelper(50);
-      scene.add(axesHelper);
+      this.scene.add(axesHelper);
     }
-
-    this.scene = scene;
-    this.camera = camera;
-    this.renderer = renderer;
   }
 
   addBody(moonBody) {
@@ -77,15 +47,9 @@ export default class System {
     this.scene.add(moonBody.overall);
   }
 
-  start() {
-    const render = () => {
-      this.ticks = (new Date().valueOf() - this.epoch) / 1000;
-      this.bodies.forEach(body => body.update());
-      this.renderer.render(this.scene, this.camera);
-      requestAnimationFrame(render);
-      return Promise.resolve("Dummy response to avoid noisy console");
-    };
-    render();
+  moveToTick(tick: number) {
+    this.ticks = tick;
+    this.bodies.forEach(body => body.update());
   }
 
   get au() {

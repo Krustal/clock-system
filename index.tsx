@@ -1,11 +1,7 @@
-import * as THREE from "three";
-import System from "./src/System";
-import OrbitalBody from "./src/OrbitalBody";
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./src/App";
 
-// System Code
-const system = new System({ au: 35 }, true);
-
-const timeScale = 0.6; // period of 1 takes ## seconds
 // Moons
 const moons = [
   {
@@ -60,13 +56,13 @@ const moons = [
     period: 1000
   },
   {
-    name: "yearRise",
+    name: "oddYear",
     size: 3.5,
     semiMajorAxis: 5,
     period: 10000
   },
   {
-    name: "yearFall",
+    name: "evenYear",
     size: 3.5,
     trueAnamoly: 180,
     semiMajorAxis: 5,
@@ -89,13 +85,7 @@ const moons = [
   }
 ];
 
-moons.forEach(moonProps => {
-  const moon = new OrbitalBody({
-    ...moonProps,
-    period: moonProps.period * timeScale,
-    system
-  });
-  system.addBody(moon);
-});
-
-system.start();
+ReactDOM.render(
+  <App baseAu={35} bodies={moons} timeScale={1} debug />,
+  document.getElementById("app")
+);

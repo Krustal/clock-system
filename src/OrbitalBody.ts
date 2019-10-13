@@ -20,7 +20,7 @@ function stringToDecimal(input: string): number {
   return val * (1 / 10 ** val.toString().length);
 }
 
-interface BodyProperties {
+export interface BodyProperties {
   name: string;
   size: number;
   trueAnamoly?: number;
@@ -32,7 +32,7 @@ interface BodyProperties {
   period?: number;
   lumoscity?: number;
   pressession?: number;
-  system: System;
+  system?: System;
 }
 
 function angleToRad(angle: number): number {
